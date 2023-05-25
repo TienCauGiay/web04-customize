@@ -1,0 +1,202 @@
+/* Start css main content */
+.content-main{
+    height: calc(100% - 45px);
+    width: 100%;
+    box-sizing: border-box;
+    background-color: aliceblue;
+    padding: 5px 10px;
+}
+
+.content-title{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    box-sizing: border-box;
+}
+
+.content-title h1{
+    font-size: 24px;
+}
+
+.content-main-body{
+    background-color: white;
+    height: calc(100% - 50px);
+    box-sizing: border-box;
+}
+
+.content-action{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 10px;
+    padding-right: 20px;
+    column-gap: 15px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.action-refresh{
+    margin-left: 10px;
+    margin-right: 15px;
+}
+
+.search-employee{
+    display: flex;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding-right: 5px;
+    border: 1px solid var(--color-btn-default-hover);
+}
+
+.search-employee input{
+    height: 30px;
+    width: 200px;
+    padding: 0px 12px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+}
+
+.search-employee input::placeholder{
+    font-style: italic;
+    font-weight: 300;
+}
+
+.list-employee{
+    margin: 15px 20px 0px 10px;
+    height: calc(100% - 90px);
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+  
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 10px;
+}
+   
+::-webkit-scrollbar-thumb {
+    background: var(--color-btn-default); 
+    border-radius: 10px;
+}
+  
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-btn-default-hover); 
+}
+/* End css main content */
+
+/* Start css table employee */
+table{
+    min-width: 1366px;
+    text-align: left;
+    border-collapse: collapse;
+    overflow-x: auto;
+    /* font-size: 8px; */
+}
+
+#function-table{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;   
+}
+
+#function-table span{
+    margin-right: 5px;
+    color: #007AFF;
+}
+
+.function-table-content{
+    padding: 5px 10px;
+}
+
+.function-table-content:hover{
+    border: 1px solid cadetblue;
+    cursor: pointer;
+}
+
+.function-table-content:focus{
+    border: 1px solid cadetblue;
+}
+
+.text-center{
+    text-align: center;
+}
+
+th, td, tr{
+    border: 1px solid var(--color-border-default);
+    padding: 5px;
+    height: 30px;
+    box-sizing: border-box;
+}
+
+tr{
+    border-top: none;
+}
+
+th{
+    background-color: #e0e0e0;
+    position: sticky;
+    top: -1px;
+    z-index: 999;
+}
+
+/* tr td:first-child {
+    position: sticky;
+    left: -1px;
+    background-color: #FFF;
+    z-index: 900;
+} */
+
+.e-id, .e-birthday{
+    width: 110px;
+}
+
+.employee-border-left {
+    border-left: none;
+    width: 20px;
+}
+
+.employee-border-right{
+    border-right: none;
+}
+
+.function-icon-select{
+    position: relative;
+}
+
+.menu-function-select{
+    position: absolute;
+    left: -80px;
+    width: 100px;
+    border: 1px solid var(--color-border-default);
+    padding-left: 0px;
+    display: none;
+    background-color: white;
+}
+
+/* .menu-function-select:active{
+    display: block;
+} */
+
+.menu-function-select li{
+    display: block;
+    text-align: left;
+    padding: 5px;
+    list-style: none;
+    font-style: normal;
+}
+
+.menu-function-select li:hover{
+    color: var(--color-btn-default);
+    background-color: var(--color-border-default);
+    cursor: pointer;
+}
+/* End css table employee */

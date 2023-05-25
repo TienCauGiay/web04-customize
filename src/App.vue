@@ -1,26 +1,47 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="container-overlay" class="container-overlay"></div>
+  <!-- dialog employee id exits -->
+  <misa-dialog-employee-id-exits></misa-dialog-employee-id-exits>
+  <!-- dialog employee input data not blank -->
+  <misa-dialog-employee-input-data-not-blank></misa-dialog-employee-input-data-not-blank>
+  <!-- dialog employee confirm delete -->
+  <misa-dialog-employee-confirm-delete></misa-dialog-employee-confirm-delete>
+  <!-- dialog employee save and close -->
+  <misa-dialog-employee-save-and-close></misa-dialog-employee-save-and-close>
+  <!-- employee detail -->
+  <EmployeeDetail></EmployeeDetail>
+  <div class="container">
+    <!-- sidebar -->
+    <TheSidebar></TheSidebar>
+    <div id="content" class="content">
+      <!-- header -->
+      <TheHeader></TheHeader>
+      <!-- main -->
+      <TheMain></TheMain>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import TheSidebar from "./layout/TheSidebar.vue";
+import TheHeader from "./layout/TheHeader.vue";
+import TheMain from "./layout/TheMain.vue";
+import EmployeeDetail from "./views/employee/EmployeeDetail.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    TheSidebar,
+    TheHeader,
+    TheMain,
+    EmployeeDetail,
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import url(@/css/blockexercise.css);
+@import url(@/css/components/icon.css);
+@import url(@/css/components/button.css);
+@import url(@/css/varialble.css);
 </style>

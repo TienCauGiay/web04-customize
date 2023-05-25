@@ -1,0 +1,51 @@
+@font-face {
+    font-family: RobotoRegular;
+    src: url('../assets/font/Roboto-Regular.ttf'); 
+}
+
+@font-face {
+    font-family: RobotoBold;
+    src: url('../assets/font/Roboto-Bold.ttf');
+}
+/* Start sss chung */
+html, body {
+    box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+    font-size: 13px;
+    font-family: RobotoRegular;
+    outline: none;
+    border: none;
+}
+
+.container{
+    display: flex;
+}
+/* End css chung */
+
+/* Start css position display */
+.position-display-center{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+/* End css position display */
+
+/* Start css dialog employee */
+#dialog-warning-employee{
+    display: none;
+}
+
+#dialog-danger-employee{
+    display: none;
+}
+
+#dialog-warning-delete-employee{
+    display: none;
+}
+
+#dialog-question-employee{
+    display: none;
+}
+/* End css dialog employee */

@@ -1,0 +1,54 @@
+/* Start css sidebar */
+.sidebar{
+    width: 160px;
+    height: 100vh;
+    background-color: #27395E;
+    color: white;
+    padding-left: 10px;
+    box-sizing: border-box;
+}
+
+.content{
+    background-color: white;
+    width: calc(100% - 160px);
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+.sidebar-logo{
+    display: flex;
+    align-items: center;
+}
+
+.toggle{
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    padding-inline-start: 0px;
+    margin: 0px;
+}
+
+.menu-item {
+    padding: 5px 0px;
+    list-style: none;
+}
+
+.menu-item:hover{
+    background-color: rgba(128, 128, 128, 0.154);
+}
+
+.menu-item i {
+    margin-right: 10px;
+}
+
+.menu-item a {
+    text-decoration: none;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+/* End css sidebar */

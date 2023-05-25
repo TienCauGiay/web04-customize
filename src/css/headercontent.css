@@ -1,0 +1,49 @@
+/* Start css header content */
+.content-header{
+    height: 45px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title{
+    display: flex;
+    align-items: center;
+}
+
+#gn{
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.header-title p{
+    font-weight: 700;
+    margin-right: 5px;
+}
+.header-action{
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+}
+
+.info-user{
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    margin-right: 5px;
+}
+
+.info-user p{
+    margin-left: 5px;
+    margin-right: 3px;
+    font-weight: 700;
+}
+
+.info-user img{
+    padding: 0px;
+    border-radius: 50%;
+}
+
+/* End css header content */

@@ -1,0 +1,81 @@
+/* Start css pagination */
+.pagination{
+    height: 40px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    justify-content: space-between;
+    padding: 3px 20px 3px 10px;
+    border-top: 1px solid var(--color-border-default);
+    margin-right: 40px;
+}
+
+.pagination-detail-pagesize{
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--color-border-default);
+    box-sizing: border-box;
+    justify-content: space-between;
+    width: 200px;
+    height: 25px;
+    box-sizing: border-box;
+    margin: 0px;
+}
+
+.pagination-detail-pagesize-content{
+    padding: 5px 10px;
+}
+
+.menu-paging-select{
+    padding: 10px;
+    background-color: #e0e0e0;
+}
+
+.menu-paging-select:hover{
+    cursor: pointer;
+}
+
+.menu-paging{
+    position: absolute;
+    bottom: 25px;
+    right: 288px;
+    border: 1px solid var(--color-border-default);
+    padding-left: 0px;
+    width: 200px;
+    box-sizing: border-box;
+    z-index: 9000;
+    display: none;
+    background-color: white;
+}
+
+.menu-paging li{
+    list-style: none;
+    padding: 5px;
+    font-style: normal;
+}
+
+.menu-paging li:hover{
+    background-color: var(--color-btn-default);
+    color: white;
+    cursor: pointer;
+}
+
+.pagination-detail{
+    display: flex;
+    align-items: center;
+}
+
+.page-number{
+    display: flex;
+}
+
+.page-number li{
+    list-style: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.page-number li:hover{
+    border: 1px solid var(--color-border-default);
+}
+/* End css pagination */
