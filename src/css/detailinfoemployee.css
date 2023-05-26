@@ -1,5 +1,4 @@
 #detail-info-employee{
-    display: none;
     width: 60%;
     height: 80%;
     background-color: white;
@@ -16,7 +15,6 @@
     bottom: 0;
     right: 0;
     z-index: 8000;
-    display: none;
 }
 
 .employee-main{
@@ -147,6 +145,32 @@
 .e-textfield-cbb input{
     border: none;
     outline: none;
+}
+
+.select-unit{
+    position: absolute;
+    width: 100%;
+    box-sizing: border-box;
+    height: 78px;
+    overflow-y: auto;
+    border-radius: 4px;
+    top: 58px;
+}
+
+.select-unit ul{
+    margin: 0px;
+    padding-left: 8px;
+}
+
+.select-unit li{
+    display: block;
+    padding: 5px;
+}
+
+.select-unit li:hover{
+    color: var(--color-btn-default);
+    background-color: var(--color-border-default);
+    cursor: pointer;
 }
 
 .full-content-quarter{

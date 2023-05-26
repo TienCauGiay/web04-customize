@@ -2,7 +2,11 @@
   <div id="detail-info-employee" class="position-display-center">
     <div class="employee-toolbar">
       <div class="question-icon icon-tb"></div>
-      <div class="close-icon icon-tb" id="employee-exit"></div>
+      <div
+        @click="btnCloseFormDetail"
+        class="close-icon icon-tb"
+        id="employee-exit"
+      ></div>
     </div>
     <div class="employee-main">
       <div class="employee-title">
@@ -45,13 +49,26 @@
           </div>
         </div>
         <div class="half-content">
-          <div class="col-md-l">
+          <div class="col-md-l" style="position: relative">
             <label>Đơn vị <span class="s-require">*</span></label>
             <div class="e-cbb" id="e-cbb">
               <div class="e-textfield-cbb">
                 <misa-input placeholder="-- Chọn Đơn Vị --"></misa-input>
               </div>
-              <i class="function-icon"></i>
+              <i class="function-icon" @click="btnShowSelectUnit"></i>
+            </div>
+            <div class="col-md-l select-unit">
+              <ul
+                v-show="isShowSelectUnit"
+                :class="{ 'select-unit-block': isShowSelectUnit }"
+                @click="btnShowSelectUnit"
+              >
+                <li>Phòng Công Nghệ Thông Tin</li>
+                <li>Phòng Kế Toán</li>
+                <li>Phòng Đào Tạo</li>
+                <li>Phòng Nhân Sự</li>
+                <li>Phòng Hành Chính</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -133,13 +150,36 @@
 <script>
 export default {
   name: "EmployeeDetail",
+  props: [],
+  data() {
+    return {
+      // Khai báo biến quy định trạng thái hiển thị của combobox chọn đơn vị
+      isShowSelectUnit: false,
+      // Khai báo đối tượng employee
+      employee: {},
+    };
+  },
+  methods: {
+    // Hàm sử lí sự kiện khi click vào icon close
+    btnCloseFormDetail() {
+      // Gọi sự kiện đóng form chi tiết từ component cha (EmployeeList)
+      this.$emit("closeFormDetail");
+    },
+    btnShowSelectUnit() {
+      this.isShowSelectUnit = !this.isShowSelectUnit;
+    },
+  },
 };
 </script>
 
 <style scoped>
 @import url(@/css/detailinfoemployee.css);
-
 i:hover {
   cursor: pointer;
+}
+
+.select-unit-block {
+  background-color: #fff;
+  border: 1px solid var(--color-border-default);
 }
 </style>

@@ -174,12 +174,13 @@ th{
 
 .menu-function-select{
     position: absolute;
+    top: 15px;
     left: -80px;
     width: 100px;
     border: 1px solid var(--color-border-default);
     padding-left: 0px;
-    display: none;
     background-color: white;
+    margin: 0px;
 }
 
 /* .menu-function-select:active{

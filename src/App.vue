@@ -1,5 +1,4 @@
 <template>
-  <div id="container-overlay" class="container-overlay"></div>
   <!-- dialog employee id exits -->
   <misa-dialog-employee-id-exits></misa-dialog-employee-id-exits>
   <!-- dialog employee input data not blank -->
@@ -8,8 +7,6 @@
   <misa-dialog-employee-confirm-delete></misa-dialog-employee-confirm-delete>
   <!-- dialog employee save and close -->
   <misa-dialog-employee-save-and-close></misa-dialog-employee-save-and-close>
-  <!-- employee detail -->
-  <EmployeeDetail></EmployeeDetail>
   <div class="container">
     <!-- sidebar -->
     <TheSidebar></TheSidebar>
@@ -26,7 +23,6 @@
 import TheSidebar from "./layout/TheSidebar.vue";
 import TheHeader from "./layout/TheHeader.vue";
 import TheMain from "./layout/TheMain.vue";
-import EmployeeDetail from "./views/employee/EmployeeDetail.vue";
 
 export default {
   name: "App",
@@ -34,7 +30,6 @@ export default {
     TheSidebar,
     TheHeader,
     TheMain,
-    EmployeeDetail,
   },
 };
 </script>
