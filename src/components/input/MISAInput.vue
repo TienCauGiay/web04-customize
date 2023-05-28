@@ -10,6 +10,7 @@ export default {
 
 <style scoped>
 @import url(@/css/components/input.css);
+
 input {
   height: 30px;
   width: 100%;

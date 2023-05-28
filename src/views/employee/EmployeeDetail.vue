@@ -53,21 +53,25 @@
             <label>Đơn vị <span class="s-require">*</span></label>
             <div class="e-cbb" id="e-cbb">
               <div class="e-textfield-cbb">
-                <misa-input placeholder="-- Chọn Đơn Vị --"></misa-input>
+                <misa-input
+                  placeholder="-- Chọn Đơn Vị --"
+                  :value="selectedUnit"
+                ></misa-input>
               </div>
               <i class="function-icon" @click="btnShowSelectUnit"></i>
             </div>
-            <div class="col-md-l select-unit">
-              <ul
-                v-show="isShowSelectUnit"
-                :class="{ 'select-unit-block': isShowSelectUnit }"
-                @click="btnShowSelectUnit"
-              >
-                <li>Phòng Công Nghệ Thông Tin</li>
-                <li>Phòng Kế Toán</li>
-                <li>Phòng Đào Tạo</li>
-                <li>Phòng Nhân Sự</li>
-                <li>Phòng Hành Chính</li>
+            <div
+              class="col-md-l select-unit"
+              :class="{ 'select-unit-block': isShowSelectUnit }"
+            >
+              <ul v-show="isShowSelectUnit" @click="btnShowSelectUnit">
+                <li
+                  v-for="(unit, index) in listUnit"
+                  :key="index"
+                  @click="onSelectedUnit(unit)"
+                >
+                  {{ unit }}
+                </li>
               </ul>
             </div>
           </div>
@@ -137,7 +141,7 @@
           <button class="btn btn-extra">Hủy</button>
         </div>
         <div class="action-right">
-          <button class="btn btn-extra">Cất</button>
+          <button class="btn btn-extra" @click="onBtnSave">Cất</button>
           <button id="btn-add-save" class="btn btn-default text">
             Cất và thêm
           </button>
@@ -150,13 +154,29 @@
 <script>
 export default {
   name: "EmployeeDetail",
-  props: [],
+  props: ["employeeSelected"],
+  created() {
+    // Chuyển đối tượng sang chuỗi json
+    let res = JSON.stringify(this.employeeSelected);
+    // Chuyển đổi chuỗi json thành đối tượng employee
+    this.employee = JSON.parse(res);
+  },
   data() {
     return {
       // Khai báo biến quy định trạng thái hiển thị của combobox chọn đơn vị
       isShowSelectUnit: false,
       // Khai báo đối tượng employee
       employee: {},
+      // Khai báo đơn vị được chọn
+      selectedUnit: "",
+      // Khai báo danh sách các đơn vị
+      listUnit: [
+        "Phòng Công Nghệ Thông Tin",
+        "Phòng Đào Tạo",
+        "Phòng Kế Toán",
+        "Phòng Nhân Sự",
+        "Phòng Hành Chính",
+      ],
     };
   },
   methods: {
@@ -165,8 +185,17 @@ export default {
       // Gọi sự kiện đóng form chi tiết từ component cha (EmployeeList)
       this.$emit("closeFormDetail");
     },
+    // Hàm xử lí sự kiện ẩn hiện options chọn đơn vị
     btnShowSelectUnit() {
       this.isShowSelectUnit = !this.isShowSelectUnit;
+    },
+    // Hàm sử lí sự kiện khi người dùng chọn đơn vị
+    onSelectedUnit(unit) {
+      this.selectedUnit = unit;
+    },
+    // Hàm sử lí sự kiện khi người dùng bấm vào nút cất trên form chi tiết
+    onBtnSave() {
+      alert(this.employee.EmployeeCode, this.employee.FullName);
     },
   },
 };
@@ -174,6 +203,7 @@ export default {
 
 <style scoped>
 @import url(@/css/detailinfoemployee.css);
+
 i:hover {
   cursor: pointer;
 }
@@ -181,5 +211,14 @@ i:hover {
 .select-unit-block {
   background-color: #fff;
   border: 1px solid var(--color-border-default);
+  z-index: 100;
+}
+
+.e-textfield-cbb input {
+  background-color: white;
+}
+
+.e-textfield-cbb input:hover {
+  background-color: white;
 }
 </style>

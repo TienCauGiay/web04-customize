@@ -66,7 +66,8 @@
               </th>
             </tr>
           </thead>
-          <tbody>
+          <!-- Kiểm tra list employees có rỗng hay không, nếu không rỗng mới hiển thị lên table -->
+          <tbody v-if="employees.length > 0">
             <tr v-for="(item, index) in employees" :key="index">
               <td class="employee-border-left">
                 <input
@@ -92,7 +93,7 @@
                 class="text-center employee-border-right e-birthday"
                 id="function-table"
               >
-                <span>Sửa</span>
+                <span @click="btnUpdateFormDetail(item)">Sửa</span>
                 <div
                   class="function-table-content"
                   @click="btnShowColFeature(index)"
@@ -103,7 +104,12 @@
                       v-show="isShowColFeature[index]"
                     >
                       <li>Nhân bản</li>
-                      <li class="menu-function-select-delete-employee">Xóa</li>
+                      <li
+                        class="menu-function-select-delete-employee"
+                        @click="onDeleteEmployee(item.EmployeeId)"
+                      >
+                        Xóa
+                      </li>
                       <li>Ngừng sử dụng</li>
                     </ul>
                   </div>
@@ -111,6 +117,49 @@
               </td>
             </tr>
           </tbody>
+          <!-- <tbody v-else>
+            <tr>
+              <td class="employee-border-left">
+                <input
+                  class="checkbox-select-row"
+                  type="checkbox"
+                  name=""
+                  id=""
+                />
+              </td>
+              <td class="e-id">oke</td>
+              <td>Oke Tiến</td>
+              <td class="e-id">Nam</td>
+              <td class="text-center e-birthday">1/2/2020</td>
+              <td>043436894</td>
+              <td>Trưởng Nhóm</td>
+              <td>oke dv</td>
+              <td>0549330586229</td>
+              <td>Vietcombank</td>
+              <td>Thanh Hóa</td>
+              <td
+                class="text-center employee-border-right e-birthday"
+                id="function-table"
+              >
+                <span @click="btnUpdateFormDetail(0)">Sửa</span>
+                <div
+                  class="function-table-content"
+                  @click="btnShowColFeature(0)"
+                >
+                  <div class="function-icon-table function-icon-select">
+                    <ul
+                      class="menu-function-select"
+                      v-show="isShowColFeature[0]"
+                    >
+                      <li>Nhân bản</li>
+                      <li class="menu-function-select-delete-employee">Xóa</li>
+                      <li>Ngừng sử dụng</li>
+                    </ul>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody> -->
         </table>
       </form>
     </div>
@@ -122,20 +171,26 @@
             id="pagination-detail-pagesize-content"
             class="pagination-detail-pagesize-content"
           >
-            20 bản ghi trên trang
+            {{ selectedRecord }} bản ghi trên trang
           </div>
           <div
             id="menu-paging-select"
             class="menu-paging-select"
             @click="btnShowSelectPaging"
           >
-            <div class="function-icon"></div>
+            <div
+              class="function-icon"
+              :class="{ 'rotate-function-icon': isShowPaging }"
+            ></div>
             <ul id="menu-paging" class="menu-paging" v-show="isShowPaging">
-              <li class="menu-paging-record">10 bản ghi trên trang</li>
-              <li class="menu-paging-record">20 bản ghi trên trang</li>
-              <li class="menu-paging-record">30 bản ghi trên trang</li>
-              <li class="menu-paging-record">50 bản ghi trên trang</li>
-              <li class="menu-paging-record">100 bản ghi trên trang</li>
+              <li
+                class="menu-paging-record"
+                v-for="(record, index) in recordOptions"
+                :key="index"
+                @click="onSelectedRecord(record)"
+              >
+                {{ record }} bản ghi trên trang
+              </li>
             </ul>
           </div>
         </div>
@@ -154,18 +209,27 @@
     <EmployeeDetail
       @closeFormDetail="onCloseFormDetail"
       v-if="isShowFormDetail"
+      :employeeSelected="employeeUpdate"
     ></EmployeeDetail>
     <div
       id="container-overlay"
       class="container-overlay"
       @closeFormDetail="onCloseFormDetail"
-      v-if="isShowFormDetail"
+      v-if="isOverlay"
     ></div>
+    <!-- dialog employee confirm delete -->
+    <misa-dialog-employee-confirm-delete
+      :employeeIdDelete="employeeIdDeleteSelected"
+      @confirmYesDeleteEmployee="onConfirmYesDeleteEmployee"
+      @confirmNoDeleteEmployee="onConfirmNoDeleteEmployee"
+      v-if="isShowDialogConfirmDelete"
+    ></misa-dialog-employee-confirm-delete>
   </div>
 </template>
 
 <script>
 import EmployeeDetail from "./EmployeeDetail.vue";
+import axios from "axios";
 export default {
   name: "EmployeeList",
   components: {
@@ -175,29 +239,39 @@ export default {
     return {
       // Khai báo biến quy định trạng thái hiển thị của form chi tiết
       isShowFormDetail: false,
+      // Khai báo biến quy định trạng thái hiển thị overlay
+      isOverlay: false,
       // Khai báo mảng quy định trạng thái hiển thị của các chức năng ở cột cuối của table
       isShowColFeature: [],
       // Khai báo biến quy định trạng thái hiển thị của các item select paging
       isShowPaging: false,
       // Khai báo list employee
       employees: [],
+      // Khai báo 1 nhân viên được chọn để xử lí hàm sửa
+      employeeUpdate: {},
+      // Khai báo số bản ghi mặc định được hiển thi trên table
+      selectedRecord: "20",
+      // Khai báo list số bản ghi có thể lựa chọn để hiển thị trên trang
+      recordOptions: ["10", "20", "30", "50", "100"],
+      // Khai báo EmployeeId của nhân viên cần xóa
+      employeeIdDeleteSelected: "",
+      // Khai báo biến quy định trạng thái ẩn hiển dialog confirm delete
+      isShowDialogConfirmDelete: false,
     };
   },
   created() {
-    fetch("https://cukcuk.manhnv.net/api/v1/Employees")
-      .then((res) => res.json())
-      .then((data) => {
-        this.employees = data;
-      });
+    this.getListEmployee();
   },
   methods: {
     // Hàm xử lí sự kiên mở form chi tiết khi click vào button thêm mới nhân viên
     onOpenFormDetail() {
       this.isShowFormDetail = true;
+      this.isOverlay = true;
     },
-    // Hàm xử lí sự kiện khí click vào nút close trong form chi tiết
+    // Hàm xử lí sự kiện khi click vào nút close trong form chi tiết
     onCloseFormDetail() {
       this.isShowFormDetail = false;
+      this.isOverlay = false;
     },
     // Hàm xử lí sự kiện đóng mở các item ở cột cuối của table khi click vào icon drop
     btnShowColFeature(index) {
@@ -207,24 +281,79 @@ export default {
     btnShowSelectPaging() {
       this.isShowPaging = !this.isShowPaging;
     },
+    // Hàm call dữ liệu nhân viên từ api
+    async getListEmployee() {
+      try {
+        await axios
+          .get(`https://cukcuk.manhnv.net/api/v1/Employees`)
+          .then((res) => (this.employees = res?.data));
+      } catch (error) {
+        console.log(error);
+      }
+    },
     // Hàm xử lí sự kiên load lại toàn bộ dữ liệu khi click vào icon refresh
     refreshData() {
       // Xử lí sau
-      // location.reload();
+      location.reload();
     },
     // Hàm xử lí định dạng ngày tháng năm
     formatDate(value) {
-      let date = new Date(value);
-      let day = date.getDay().toString().padStart(2, "0");
-      let month = (date.getMonth() + 1).toString().padStart(2, "0");
-      let year = date.getFullYear();
-      return `${day}/${month}/${year}`;
+      try {
+        let date = new Date(value);
+        let day = date.getDay().toString().padStart(2, "0");
+        let month = (date.getMonth() + 1).toString().padStart(2, "0");
+        let year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      } catch (error) {
+        return "";
+      }
+    },
+    // Hàm xử lí cập nhật thông tin nhân viên
+    btnUpdateFormDetail(employee) {
+      this.employeeUpdate = employee;
+      this.isShowFormDetail = true;
+      this.isOverlay = true;
+    },
+    // Hàm xử lí sự kiện click vào các item lựa chọn số bản ghi hiển thị trên table
+    onSelectedRecord(record) {
+      this.selectedRecord = record;
+    },
+    // Hàm xử lí sự kiện khi bấm vào item xóa nhân viên thì hiển thị dialog xác nhận xóa
+    onDeleteEmployee(employeeId) {
+      this.isShowDialogConfirmDelete = true;
+      this.isOverlay = true;
+      this.employeeIdDeleteSelected = employeeId;
+    },
+    // Hàm xử lí sự kiện khi click vào button có trong dialog xác nhận xóa
+    async onConfirmYesDeleteEmployee() {
+      try {
+        await axios.delete(
+          `https://cukcuk.manhnv.net/api/v1/Employees/${this.employeeIdDeleteSelected}`
+        );
+        this.isShowDialogConfirmDelete = false;
+        this.isOverlay = false;
+        // Sau khi xóa gọi lại api lấy danh sách nhân viên
+        this.getListEmployee();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // Hàm xử lí sự kiện khi click vào button không trong dialog xác nhận xóa
+    onConfirmNoDeleteEmployee() {
+      this.isShowDialogConfirmDelete = false;
+      this.isOverlay = false;
     },
   },
 };
 </script>
 
-<style>
+<style scoped>
 @import url(@/css/maincontent.css);
 @import url(@/css/pagingemployee.css);
+#function-table span:hover {
+  cursor: pointer;
+}
+.rotate-function-icon {
+  transform: rotate(180deg);
+}
 </style>
