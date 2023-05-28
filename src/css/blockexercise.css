@@ -41,10 +41,6 @@ html, body {
     display: none;
 }
 
-#dialog-warning-delete-employee{
-    display: none;
-}
-
 #dialog-question-employee{
     display: none;
 }
