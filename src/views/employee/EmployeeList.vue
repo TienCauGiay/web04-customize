@@ -1,9 +1,10 @@
 <template>
   <div class="content-title">
     <h1>Nhân viên</h1>
-    <button id="btn-add" class="btn btn-default" @click="onOpenFormDetail">
-      <div class="text">Thêm nhân viên mới</div>
-    </button>
+    <misa-button-default
+      :textButton="'Thêm mới nhân viên'"
+      @click="onOpenFormDetail"
+    ></misa-button-default>
   </div>
   <div class="content-main-body">
     <div class="content-action">
@@ -68,7 +69,11 @@
           </thead>
           <!-- Kiểm tra list employees có rỗng hay không, nếu không rỗng mới hiển thị lên table -->
           <tbody v-if="employees.length > 0">
-            <tr v-for="(item, index) in employees" :key="index">
+            <tr
+              v-for="(item, index) in employees"
+              :key="index"
+              @dblclick="btnUpdateFormDetail(item)"
+            >
               <td class="employee-border-left">
                 <input
                   class="checkbox-select-row"
@@ -93,7 +98,7 @@
                 class="text-center employee-border-right e-birthday"
                 id="function-table"
               >
-                <span @click="btnUpdateFormDetail(item)">Sửa</span>
+                <span>Sửa</span>
                 <div
                   class="function-table-content"
                   @click="btnShowColFeature(index)"
@@ -117,49 +122,6 @@
               </td>
             </tr>
           </tbody>
-          <!-- <tbody v-else>
-            <tr>
-              <td class="employee-border-left">
-                <input
-                  class="checkbox-select-row"
-                  type="checkbox"
-                  name=""
-                  id=""
-                />
-              </td>
-              <td class="e-id">oke</td>
-              <td>Oke Tiến</td>
-              <td class="e-id">Nam</td>
-              <td class="text-center e-birthday">1/2/2020</td>
-              <td>043436894</td>
-              <td>Trưởng Nhóm</td>
-              <td>oke dv</td>
-              <td>0549330586229</td>
-              <td>Vietcombank</td>
-              <td>Thanh Hóa</td>
-              <td
-                class="text-center employee-border-right e-birthday"
-                id="function-table"
-              >
-                <span @click="btnUpdateFormDetail(0)">Sửa</span>
-                <div
-                  class="function-table-content"
-                  @click="btnShowColFeature(0)"
-                >
-                  <div class="function-icon-table function-icon-select">
-                    <ul
-                      class="menu-function-select"
-                      v-show="isShowColFeature[0]"
-                    >
-                      <li>Nhân bản</li>
-                      <li class="menu-function-select-delete-employee">Xóa</li>
-                      <li>Ngừng sử dụng</li>
-                    </ul>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tbody> -->
         </table>
       </form>
     </div>
@@ -246,7 +208,26 @@ export default {
       // Khai báo biến quy định trạng thái hiển thị của các item select paging
       isShowPaging: false,
       // Khai báo list employee
-      employees: [],
+      employees: [
+        {
+          EmployeeCode: "NV-001",
+          FullName: "Bùi Ngọc Tiến",
+          GenderName: "Nam",
+          DateOfBirth: "2023-05-09T00:00:00",
+        },
+        {
+          EmployeeCode: "NV-002",
+          FullName: "Bùi Duyên",
+          GenderName: "Nữ",
+          DateOfBirth: "2020-06-02T00:00:00",
+        },
+        {
+          EmployeeCode: "NV-003",
+          FullName: "Bùi Tuyên",
+          GenderName: "",
+          DateOfBirth: "1970-05-01T00:00:00",
+        },
+      ],
       // Khai báo 1 nhân viên được chọn để xử lí hàm sửa
       employeeUpdate: {},
       // Khai báo số bản ghi mặc định được hiển thi trên table
@@ -293,7 +274,6 @@ export default {
     },
     // Hàm xử lí sự kiên load lại toàn bộ dữ liệu khi click vào icon refresh
     refreshData() {
-      // Xử lí sau
       location.reload();
     },
     // Hàm xử lí định dạng ngày tháng năm
@@ -355,5 +335,10 @@ export default {
 }
 .rotate-function-icon {
   transform: rotate(180deg);
+}
+
+tr:hover {
+  background-color: #e7f5ec;
+  cursor: pointer;
 }
 </style>

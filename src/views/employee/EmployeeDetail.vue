@@ -24,26 +24,43 @@
         <div class="half-content">
           <div class="col-md-n">
             <label>Mã <span class="s-require">*</span></label>
-            <misa-input></misa-input>
+            <misa-input v-model="employee.EmployeeCode"></misa-input>
           </div>
           <div class="col-md-tb">
             <label>Tên <span class="s-require">*</span></label>
-            <misa-input></misa-input>
+            <misa-input v-model="employee.FullName"></misa-input>
           </div>
         </div>
         <div class="half-content">
           <div class="col-md-n">
             <label>Ngày sinh</label>
-            <input type="date" class="textfield e-textfield" name="" />
+            <misa-input
+              v-model="formattedDate"
+              placeholder="dd/mm/yyyy"
+            ></misa-input>
           </div>
           <div class="col-md-tb">
             <label>Giới tính</label>
             <div class="e-gender">
-              <input type="radio" name="gender" />
+              <input
+                type="radio"
+                name="gender"
+                :checked="employee.GenderName === 'Nam'"
+              />
               <span>Nam</span>
-              <input type="radio" name="gender" />
+              <input
+                type="radio"
+                name="gender"
+                :checked="employee.GenderName === 'Nữ'"
+              />
               <span>Nữ</span>
-              <input type="radio" name="gender" />
+              <input
+                type="radio"
+                name="gender"
+                :checked="
+                  employee.GenderName !== 'Nam' && employee.GenderName !== 'Nữ'
+                "
+              />
               <span>Khác</span>
             </div>
           </div>
@@ -55,7 +72,8 @@
               <div class="e-textfield-cbb">
                 <misa-input
                   placeholder="-- Chọn Đơn Vị --"
-                  :value="selectedUnit"
+                  v-model="employee.DepartmentName"
+                  disabled
                 ></misa-input>
               </div>
               <i class="function-icon" @click="btnShowSelectUnit"></i>
@@ -68,9 +86,9 @@
                 <li
                   v-for="(unit, index) in listUnit"
                   :key="index"
-                  @click="onSelectedUnit(unit)"
+                  @click="onSelectedUnit(unit.DepartmentName)"
                 >
-                  {{ unit }}
+                  {{ unit.DepartmentName }}
                 </li>
               </ul>
             </div>
@@ -83,7 +101,10 @@
           </div>
           <div class="col-md-n">
             <label>Ngày cấp</label>
-            <input type="date" class="textfield e-textfield" name="" />
+            <misa-input
+              v-model="employee.DateOfRelease"
+              placeholder="dd/mm/yyyy"
+            ></misa-input>
           </div>
         </div>
         <div class="half-content">
@@ -138,20 +159,34 @@
       </div>
       <div class="employee-action">
         <div class="action-left">
-          <button class="btn btn-extra">Hủy</button>
+          <misa-button-extra
+            :textButtonExtra="'Hủy'"
+            @click="onBtnCancel"
+          ></misa-button-extra>
         </div>
         <div class="action-right">
-          <button class="btn btn-extra" @click="onBtnSave">Cất</button>
-          <button id="btn-add-save" class="btn btn-default text">
-            Cất và thêm
-          </button>
+          <misa-button-extra
+            :textButtonExtra="'Cất'"
+            @click="onBtnClose"
+          ></misa-button-extra>
+          <misa-button-default
+            :textButton="'Cất và thêm'"
+            @click="onBtnSaveAndClose"
+          ></misa-button-default>
         </div>
       </div>
     </div>
+    <!-- dialog employee input data not blank -->
+    <misa-dialog-employee-input-data-not-blank
+      v-if="isShowDialogDataNotNull"
+      :valueNotNull="dataNotNull"
+      @closeBtnSaveAndClose="onCloseBtnSaveAndClose"
+    ></misa-dialog-employee-input-data-not-blank>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "EmployeeDetail",
   props: ["employeeSelected"],
@@ -160,6 +195,7 @@ export default {
     let res = JSON.stringify(this.employeeSelected);
     // Chuyển đổi chuỗi json thành đối tượng employee
     this.employee = JSON.parse(res);
+    this.getListDepartment();
   },
   data() {
     return {
@@ -167,19 +203,39 @@ export default {
       isShowSelectUnit: false,
       // Khai báo đối tượng employee
       employee: {},
-      // Khai báo đơn vị được chọn
-      selectedUnit: "",
       // Khai báo danh sách các đơn vị
-      listUnit: [
-        "Phòng Công Nghệ Thông Tin",
-        "Phòng Đào Tạo",
-        "Phòng Kế Toán",
-        "Phòng Nhân Sự",
-        "Phòng Hành Chính",
-      ],
+      listUnit: [],
+      // Khai báo trạng thái hiển thị của dialog cảnh báo dữ liệu k được để trống
+      isShowDialogDataNotNull: false,
+      // Khai báo biến xác định trường nào k được để trống
+      dataNotNull: "",
     };
   },
+  computed: {
+    formattedDate: {
+      get() {
+        return this.formatDate(this.employee.DateOfBirth) !== "NaN/NaN/NaN"
+          ? this.formatDate(this.employee.DateOfBirth)
+          : "";
+      },
+      set(value) {
+        this.employee.DateOfBirth = value;
+      },
+    },
+  },
   methods: {
+    // Hàm xử lí định dạng ngày tháng năm
+    formatDate(value) {
+      try {
+        let date = new Date(value);
+        let day = date.getDay().toString().padStart(2, "0");
+        let month = (date.getMonth() + 1).toString().padStart(2, "0");
+        let year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      } catch (error) {
+        return "";
+      }
+    },
     // Hàm sử lí sự kiện khi click vào icon close
     btnCloseFormDetail() {
       // Gọi sự kiện đóng form chi tiết từ component cha (EmployeeList)
@@ -189,13 +245,45 @@ export default {
     btnShowSelectUnit() {
       this.isShowSelectUnit = !this.isShowSelectUnit;
     },
-    // Hàm sử lí sự kiện khi người dùng chọn đơn vị
+    // Hàm xử lí sự kiện khi người dùng chọn đơn vị
     onSelectedUnit(unit) {
-      this.selectedUnit = unit;
+      this.employee.DepartmentName = unit;
     },
-    // Hàm sử lí sự kiện khi người dùng bấm vào nút cất trên form chi tiết
-    onBtnSave() {
-      alert(this.employee.EmployeeCode, this.employee.FullName);
+    // Hàm xử lí sự kiện khi người dùng bấm vào nút cất trên form chi tiết
+    onBtnClose() {},
+    // Hàm xử lí sự kiện khi người dùng bấm vào nut cất và thêm trên form chi tiết
+    onBtnSaveAndClose() {
+      this.isShowDialogDataNotNull = true;
+      if (!this.employee.EmployeeCode) {
+        this.dataNotNull = "Mã";
+        return;
+      }
+      if (!this.employee.FullName) {
+        this.dataNotNull = "Tên";
+        return;
+      }
+      if (!this.employee.DepartmentName) {
+        this.dataNotNull = "Đơn vị";
+        return;
+      }
+    },
+    // Hàm đóng dialog cảnh báo dữ liệu k được để trống
+    onCloseBtnSaveAndClose() {
+      this.isShowDialogDataNotNull = false;
+    },
+    // Hàm lấy danh sách department
+    async getListDepartment() {
+      try {
+        await axios
+          .get(`https://cukcuk.manhnv.net/api/v1/Departments`)
+          .then((res) => (this.listUnit = res?.data));
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // Hàm xử lí sự kiện khi click vào nút hủy trong form chi tiết
+    onBtnCancel() {
+      this.btnCloseFormDetail();
     },
   },
 };

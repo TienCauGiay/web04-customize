@@ -13,20 +13,15 @@
       </div>
     </div>
     <div class="dialog-warning-delete-footer">
-      <button
-        class="btn btn-extra"
-        id="btn-warning-delete-employee-no"
+      <misa-button-extra
         @click="btnConfirmNoDeleteEmployee"
-      >
-        <div class="text-extra">Không</div>
-      </button>
-      <button
-        class="btn btn-default btn-no-minwwidth"
-        id="btn-warning-delete-employee-yes"
+        :textButtonExtra="'Không'"
+      ></misa-button-extra>
+      <misa-button-default
+        class="btn-no-minwwidth"
         @click="btnConfirmYesDeleteEmployee"
-      >
-        <div class="text">Có</div>
-      </button>
+        :textButton="'Có'"
+      ></misa-button-default>
     </div>
   </div>
 </template>

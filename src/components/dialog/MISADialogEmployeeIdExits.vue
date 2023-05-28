@@ -13,9 +13,7 @@
       </div>
     </div>
     <div class="dialog-warning-footer">
-      <button class="btn btn-default">
-        <div class="text">Đồng ý</div>
-      </button>
+      <misa-button-default :textButton="'Đồng ý'"></misa-button-default>
     </div>
   </div>
 </template>

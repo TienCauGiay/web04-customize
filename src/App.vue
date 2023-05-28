@@ -1,8 +1,6 @@
 <template>
   <!-- dialog employee id exits -->
   <misa-dialog-employee-id-exits></misa-dialog-employee-id-exits>
-  <!-- dialog employee input data not blank -->
-  <misa-dialog-employee-input-data-not-blank></misa-dialog-employee-input-data-not-blank>
   <!-- dialog employee save and close -->
   <misa-dialog-employee-save-and-close></misa-dialog-employee-save-and-close>
   <div class="container">
@@ -35,6 +33,5 @@ export default {
 <style>
 @import url(@/css/blockexercise.css);
 @import url(@/css/components/icon.css);
-@import url(@/css/components/button.css);
 @import url(@/css/varialble.css);
 </style>

@@ -11,17 +11,17 @@
     </div>
     <div class="dialog-question-footer">
       <div class="dialog-question-footer-left">
-        <button class="btn btn-extra btn-no-minwwidth">
-          <div class="text-extra">Hủy</div>
-        </button>
+        <misa-button-extra
+          :textButtonExtra="'Hủy'"
+          class="btn-no-minwwidth"
+        ></misa-button-extra>
       </div>
       <div class="dialog-question-footer-right">
-        <button class="btn btn-extra" id="btn-dialog-question-employee-no">
-          <div class="text-extra">Không</div>
-        </button>
-        <button class="btn btn-default btn-no-minwwidth">
-          <div class="text">Có</div>
-        </button>
+        <misa-button-extra :textButtonExtra="'Không'"></misa-button-extra>
+        <misa-button-default
+          :textButton="'Có'"
+          class="btn-no-minwwidth"
+        ></misa-button-default>
       </div>
     </div>
   </div>
