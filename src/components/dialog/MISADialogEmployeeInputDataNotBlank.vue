@@ -28,6 +28,11 @@ export default {
   name: "MISADialogEmployeeInputDataNotBlank",
   props: ["valueNotNull"],
   methods: {
+    /**
+     * Mô tả: Hàm gọi sự kiện cất và thêm trong component cha (EmployeeDetail)
+     * created by : BNTIEN
+     * created date: 29-05-2023 08:35:28
+     */
     btnClose() {
       this.$emit("closeBtnSaveAndClose");
     },

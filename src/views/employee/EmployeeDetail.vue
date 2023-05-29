@@ -24,7 +24,10 @@
         <div class="half-content">
           <div class="col-md-n">
             <label>Mã <span class="s-require">*</span></label>
-            <misa-input v-model="employee.EmployeeCode"></misa-input>
+            <misa-input
+              v-model="employee.EmployeeCode"
+              ref="codeEmployee"
+            ></misa-input>
           </div>
           <div class="col-md-tb">
             <label>Tên <span class="s-require">*</span></label>
@@ -182,20 +185,34 @@
       :valueNotNull="dataNotNull"
       @closeBtnSaveAndClose="onCloseBtnSaveAndClose"
     ></misa-dialog-employee-input-data-not-blank>
+    <!-- dialog employee id exits -->
+    <misa-dialog-employee-id-exits
+      :textEmployeeIdExits="contentEmployeeIdExits"
+      v-if="isShowDialogIdExits"
+      @closeDialogIdExits="onCloseDialogIdExits"
+    ></misa-dialog-employee-id-exits>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import { formatDate } from "@/js/formatData.js";
+import { getAllDepartment } from "@/js/department.js";
+import { getEmployeeById } from "@/js/employee";
 export default {
   name: "EmployeeDetail",
-  props: ["employeeSelected"],
+  props: ["employeeSelected", "statusEdit"],
   created() {
-    // Chuyển đối tượng sang chuỗi json
-    let res = JSON.stringify(this.employeeSelected);
-    // Chuyển đổi chuỗi json thành đối tượng employee
-    this.employee = JSON.parse(res);
     this.getListDepartment();
+  },
+  created() {
+    if (!this.statusEdit) {
+      this.employee = {};
+    } else {
+      // Chuyển đối tượng sang chuỗi json
+      let res = JSON.stringify(this.employeeSelected);
+      // Chuyển đổi chuỗi json thành đối tượng employee
+      this.employee = JSON.parse(res);
+    }
   },
   data() {
     return {
@@ -207,8 +224,12 @@ export default {
       listUnit: [],
       // Khai báo trạng thái hiển thị của dialog cảnh báo dữ liệu k được để trống
       isShowDialogDataNotNull: false,
-      // Khai báo biến xác định trường nào k được để trống
+      // Khai báo biến xác định nội dung trường nào k được để trống
       dataNotNull: "",
+      // Khai báo trạng thái hiển thị của dialog cảnh báo mã nhân viên đã tồn tại
+      isShowDialogIdExits: false,
+      // Khai báo biến xác định thông tin của mã nhân viên đã tồn tại
+      contentEmployeeIdExits: "",
     };
   },
   computed: {
@@ -224,66 +245,113 @@ export default {
     },
   },
   methods: {
-    // Hàm xử lí định dạng ngày tháng năm
-    formatDate(value) {
-      try {
-        let date = new Date(value);
-        let day = date.getDay().toString().padStart(2, "0");
-        let month = (date.getMonth() + 1).toString().padStart(2, "0");
-        let year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      } catch (error) {
-        return "";
-      }
-    },
-    // Hàm sử lí sự kiện khi click vào icon close
+    /**
+     * Mô tả: Tái sử dụng hàm formatDate
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:54:16
+     */
+    formatDate: formatDate,
+    /**
+     * Mô tả: Hàm sử lí sự kiện khi click vào icon close
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:54:28
+     */
     btnCloseFormDetail() {
       // Gọi sự kiện đóng form chi tiết từ component cha (EmployeeList)
       this.$emit("closeFormDetail");
     },
-    // Hàm xử lí sự kiện ẩn hiện options chọn đơn vị
+    /**
+     * Mô tả: Hàm xử lí sự kiện ẩn hiện options chọn đơn vị
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:54:42
+     */
     btnShowSelectUnit() {
       this.isShowSelectUnit = !this.isShowSelectUnit;
     },
-    // Hàm xử lí sự kiện khi người dùng chọn đơn vị
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi người dùng chọn đơn vị
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:54:52
+     */
     onSelectedUnit(unit) {
       this.employee.DepartmentName = unit;
     },
-    // Hàm xử lí sự kiện khi người dùng bấm vào nút cất trên form chi tiết
-    onBtnClose() {},
-    // Hàm xử lí sự kiện khi người dùng bấm vào nut cất và thêm trên form chi tiết
-    onBtnSaveAndClose() {
-      this.isShowDialogDataNotNull = true;
-      if (!this.employee.EmployeeCode) {
-        this.dataNotNull = "Mã";
-        return;
-      }
-      if (!this.employee.FullName) {
-        this.dataNotNull = "Tên";
-        return;
-      }
-      if (!this.employee.DepartmentName) {
-        this.dataNotNull = "Đơn vị";
-        return;
-      }
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi người dùng bấm vào nút cất trên form chi tiết
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:55:05
+     */
+    onBtnClose() {
+      // Chưa xử lí
     },
-    // Hàm đóng dialog cảnh báo dữ liệu k được để trống
-    onCloseBtnSaveAndClose() {
-      this.isShowDialogDataNotNull = false;
-    },
-    // Hàm lấy danh sách department
-    async getListDepartment() {
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi người dùng bấm vào nut cất và thêm trên form chi tiết
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:55:23
+     */
+    async onBtnSaveAndClose() {
       try {
-        await axios
-          .get(`https://cukcuk.manhnv.net/api/v1/Departments`)
-          .then((res) => (this.listUnit = res?.data));
+        // Kiểm tra xem các trường bắt buộc đã được nhập dữ liệu chưa, nếu chưa thì thông báo cho người dùng
+        this.isShowDialogDataNotNull = true;
+        if (!this.employee.EmployeeCode) {
+          this.dataNotNull = "Mã";
+          this.$refs.codeEmployee.focus();
+          return;
+        }
+        if (!this.employee.FullName) {
+          this.dataNotNull = "Tên";
+          return;
+        }
+        if (!this.employee.DepartmentName) {
+          this.dataNotNull = "Đơn vị";
+          return;
+        }
+        // Kiểm tra xem mã nhân viên đã tồn tại trong database chưa, nếu đã tồn tại thì thông báo cho người dùng
+        let employeeById = {};
+        const res = await getEmployeeById();
+        employeeById = res.data;
+        if (JSON.stringify(employeeById) === JSON.stringify({})) {
+          // Nếu mã nhân viên cần thêm chưa có trong hệ thống
+          alert(1);
+        } else {
+          alert(2);
+        }
       } catch (error) {
         console.log(error);
       }
     },
-    // Hàm xử lí sự kiện khi click vào nút hủy trong form chi tiết
+    /**
+     * Mô tả: Hàm đóng dialog cảnh báo dữ liệu k được để trống
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:55:59
+     */
+    onCloseBtnSaveAndClose() {
+      this.isShowDialogDataNotNull = false;
+    },
+    /**
+     * Mô tả: Hàm lấy danh sách department từ api
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:56:10
+     */
+    async getListDepartment() {
+      const res = await getAllDepartment();
+      this.listUnit = res.data;
+    },
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi click vào nút hủy trong form chi tiết
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:56:20
+     */
     onBtnCancel() {
       this.btnCloseFormDetail();
+    },
+    /**
+     * Mô tả: Hàm xử lí sự kiện đóng dialog cảnh báo mã nhân viên đã tồn tại
+     * created by : BNTIEN
+     * created date: 29-05-2023 08:28:19
+     */
+    onCloseDialogIdExits() {
+      this.isShowDialogIdExits = false;
     },
   },
 };

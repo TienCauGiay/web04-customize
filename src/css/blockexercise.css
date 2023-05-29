@@ -33,10 +33,6 @@ html, body {
 /* End css position display */
 
 /* Start css dialog employee */
-#dialog-warning-employee{
-    display: none;
-}
-
 #dialog-question-employee{
     display: none;
 }

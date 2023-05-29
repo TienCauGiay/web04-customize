@@ -1,6 +1,4 @@
 <template>
-  <!-- dialog employee id exits -->
-  <misa-dialog-employee-id-exits></misa-dialog-employee-id-exits>
   <!-- dialog employee save and close -->
   <misa-dialog-employee-save-and-close></misa-dialog-employee-save-and-close>
   <div class="container">

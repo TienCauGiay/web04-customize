@@ -70,8 +70,8 @@
           <!-- Kiểm tra list employees có rỗng hay không, nếu không rỗng mới hiển thị lên table -->
           <tbody v-if="employees.length > 0">
             <tr
-              v-for="(item, index) in employees"
-              :key="index"
+              v-for="item in employees"
+              :key="item.EmployeeId"
               @dblclick="btnUpdateFormDetail(item)"
             >
               <td class="employee-border-left">
@@ -172,6 +172,7 @@
       @closeFormDetail="onCloseFormDetail"
       v-if="isShowFormDetail"
       :employeeSelected="employeeUpdate"
+      :statusEdit="isStatusEdit"
     ></EmployeeDetail>
     <div
       id="container-overlay"
@@ -191,7 +192,8 @@
 
 <script>
 import EmployeeDetail from "./EmployeeDetail.vue";
-import axios from "axios";
+import { formatDate } from "@/js/formatData.js";
+import { getEmployeeById, getAllEmployee } from "@/js/employee.js";
 export default {
   name: "EmployeeList",
   components: {
@@ -238,87 +240,120 @@ export default {
       employeeIdDeleteSelected: "",
       // Khai báo biến quy định trạng thái ẩn hiển dialog confirm delete
       isShowDialogConfirmDelete: false,
+      // Khai báo biến kiểm tra xem form chi tiết đang ở trạng thái thêm hay sửa
+      isStatusEdit: false,
     };
   },
   created() {
     this.getListEmployee();
   },
   methods: {
-    // Hàm xử lí sự kiên mở form chi tiết khi click vào button thêm mới nhân viên
+    /**
+     * Mô tả: Tái sử dụng hàm formatDate
+     * created by : BNTIEN
+     * created date: 29-05-2023 09:48:39
+     */
+    formatDate: formatDate,
+    /**
+     * Mô tả: Hàm xử lí sự kiên mở form chi tiết khi click vào button thêm mới nhân viên
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:48:01
+     */
     onOpenFormDetail() {
       this.isShowFormDetail = true;
       this.isOverlay = true;
     },
-    // Hàm xử lí sự kiện khi click vào nút close trong form chi tiết
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi click vào nút close trong form chi tiết
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:48:35
+     */
     onCloseFormDetail() {
       this.isShowFormDetail = false;
       this.isOverlay = false;
+      this.isStatusEdit = false;
     },
-    // Hàm xử lí sự kiện đóng mở các item ở cột cuối của table khi click vào icon drop
+    /**
+     * Mô tả: Hàm xử lí sự kiện đóng mở các item ở cột cuối của table khi click vào icon drop
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:48:54
+     */
     btnShowColFeature(index) {
       this.isShowColFeature[index] = !this.isShowColFeature[index];
     },
-    // Hàm xử lí sự kiện đóng mở lựa chọn số phần tử hiển thị trên 1 trang trong table
+    /**
+     * Mô tả: Hàm xử lí sự kiện đóng mở lựa chọn số phần tử hiển thị trên 1 trang trong table
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:49:05
+     */
     btnShowSelectPaging() {
       this.isShowPaging = !this.isShowPaging;
     },
-    // Hàm call dữ liệu nhân viên từ api
+    /**
+     * Mô tả: Hàm lấy dữ liệu nhân viên từ api
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:49:20
+     */
     async getListEmployee() {
-      try {
-        await axios
-          .get(`https://cukcuk.manhnv.net/api/v1/Employees`)
-          .then((res) => (this.employees = res?.data));
-      } catch (error) {
-        console.log(error);
-      }
+      const res = await getAllEmployee();
+      this.employees = res.data;
     },
-    // Hàm xử lí sự kiên load lại toàn bộ dữ liệu khi click vào icon refresh
+    /**
+     * Mô tả: Hàm xử lí sự kiên load lại toàn bộ dữ liệu khi click vào icon refresh
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:49:31
+     */
     refreshData() {
       location.reload();
     },
-    // Hàm xử lí định dạng ngày tháng năm
-    formatDate(value) {
-      try {
-        let date = new Date(value);
-        let day = date.getDay().toString().padStart(2, "0");
-        let month = (date.getMonth() + 1).toString().padStart(2, "0");
-        let year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      } catch (error) {
-        return "";
-      }
-    },
-    // Hàm xử lí cập nhật thông tin nhân viên
+    /**
+     * Mô tả: Hàm xử lí cập nhật thông tin nhân viên
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:49:56
+     */
     btnUpdateFormDetail(employee) {
       this.employeeUpdate = employee;
       this.isShowFormDetail = true;
       this.isOverlay = true;
+      this.isStatusEdit = true;
     },
-    // Hàm xử lí sự kiện click vào các item lựa chọn số bản ghi hiển thị trên table
+    /**
+     * Mô tả: Hàm xử lí sự kiện click vào các item lựa chọn số bản ghi hiển thị trên table
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:50:06
+     */
     onSelectedRecord(record) {
       this.selectedRecord = record;
     },
-    // Hàm xử lí sự kiện khi bấm vào item xóa nhân viên thì hiển thị dialog xác nhận xóa
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi bấm vào item xóa nhân viên thì hiển thị dialog xác nhận xóa
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:50:15
+     */
     onDeleteEmployee(employeeId) {
       this.isShowDialogConfirmDelete = true;
       this.isOverlay = true;
       this.employeeIdDeleteSelected = employeeId;
     },
-    // Hàm xử lí sự kiện khi click vào button có trong dialog xác nhận xóa
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi người dùng xác nhận xóa
+     * created by : BNTIEN
+     * created date: 28-05-2023 21:09:01
+     */
     async onConfirmYesDeleteEmployee() {
-      try {
-        await axios.delete(
-          `https://cukcuk.manhnv.net/api/v1/Employees/${this.employeeIdDeleteSelected}`
-        );
+      const res = await getEmployeeById(this.employeeIdDeleteSelected);
+      if (res.status === 200) {
         this.isShowDialogConfirmDelete = false;
         this.isOverlay = false;
-        // Sau khi xóa gọi lại api lấy danh sách nhân viên
-        this.getListEmployee();
-      } catch (error) {
-        console.log(error);
       }
+      // Sau khi xóa gọi lại api lấy danh sách nhân viên
+      this.getListEmployee();
     },
-    // Hàm xử lí sự kiện khi click vào button không trong dialog xác nhận xóa
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi click vào button không trong dialog xác nhận xóa
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:51:41
+     */
     onConfirmNoDeleteEmployee() {
       this.isShowDialogConfirmDelete = false;
       this.isOverlay = false;

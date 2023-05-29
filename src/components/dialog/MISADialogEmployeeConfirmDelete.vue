@@ -31,9 +31,19 @@ export default {
   name: "MISADialogEmployeeConfirmDelete",
   props: ["employeeIdDelete"],
   methods: {
+    /**
+     * Mô tả: Hàm gọi sự kiện xóa nhân viên khi người dùng chọn có trong component cha (EmployeeList)
+     * created by : BNTIEN
+     * created date: 29-05-2023 08:33:41
+     */
     btnConfirmYesDeleteEmployee() {
       this.$emit("confirmYesDeleteEmployee");
     },
+    /**
+     * Mô tả: Hàm gọi sự kiện hủy xóa nhân viên khi người dùng chọn không trong component cha (EmployeeList)
+     * created by : BNTIEN
+     * created date: 29-05-2023 08:35:00
+     */
     btnConfirmNoDeleteEmployee() {
       this.$emit("confirmNoDeleteEmployee");
     },
