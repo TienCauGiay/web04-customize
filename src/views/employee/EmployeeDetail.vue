@@ -196,14 +196,11 @@
 
 <script>
 import { formatDate } from "@/js/formatData.js";
-import { getAllDepartment } from "@/js/department.js";
-import { getEmployeeById } from "@/js/employee";
+import apiEmployeemanage from "@/js/apiService";
+import { tableDataManageEmployee } from "@/common/tableData.js";
 export default {
   name: "EmployeeDetail",
   props: ["employeeSelected", "statusEdit"],
-  created() {
-    this.getListDepartment();
-  },
   created() {
     if (!this.statusEdit) {
       this.employee = {};
@@ -212,6 +209,7 @@ export default {
       let res = JSON.stringify(this.employeeSelected);
       // Chuyển đổi chuỗi json thành đối tượng employee
       this.employee = JSON.parse(res);
+      this.getListDepartment();
     }
   },
   data() {
@@ -308,7 +306,10 @@ export default {
         }
         // Kiểm tra xem mã nhân viên đã tồn tại trong database chưa, nếu đã tồn tại thì thông báo cho người dùng
         let employeeById = {};
-        const res = await getEmployeeById();
+        const res = await apiEmployeemanage.getObjectById(
+          `/${tableDataManageEmployee.EMPLOYEE}`,
+          `/${this.employee.EmployeeCode}`
+        );
         employeeById = res.data;
         if (JSON.stringify(employeeById) === JSON.stringify({})) {
           // Nếu mã nhân viên cần thêm chưa có trong hệ thống
@@ -334,7 +335,9 @@ export default {
      * created date: 29-05-2023 07:56:10
      */
     async getListDepartment() {
-      const res = await getAllDepartment();
+      const res = await apiEmployeemanage.getListAllObject(
+        `/${tableDataManageEmployee.DEPARTMENT}`
+      );
       this.listUnit = res.data;
     },
     /**

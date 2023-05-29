@@ -193,7 +193,9 @@
 <script>
 import EmployeeDetail from "./EmployeeDetail.vue";
 import { formatDate } from "@/js/formatData.js";
-import { getEmployeeById, getAllEmployee } from "@/js/employee.js";
+import apiEmployeemanage from "@/js/apiService";
+import { tableDataManageEmployee } from "@/common/tableData.js";
+import { CHECK_STATUS } from "@/common/apiStatus";
 export default {
   name: "EmployeeList",
   components: {
@@ -295,7 +297,9 @@ export default {
      * created date: 29-05-2023 07:49:20
      */
     async getListEmployee() {
-      const res = await getAllEmployee();
+      const res = await apiEmployeemanage.getListAllObject(
+        `/${tableDataManageEmployee.EMPLOYEE}`
+      );
       this.employees = res.data;
     },
     /**
@@ -341,8 +345,11 @@ export default {
      * created date: 28-05-2023 21:09:01
      */
     async onConfirmYesDeleteEmployee() {
-      const res = await getEmployeeById(this.employeeIdDeleteSelected);
-      if (res.status === 200) {
+      const res = await apiEmployeemanage.getObjectById(
+        `/${tableDataManageEmployee.EMPLOYEE}`,
+        `/${this.employeeIdDeleteSelected}`
+      );
+      if (CHECK_STATUS.isResponseStatusOk(res.status)) {
         this.isShowDialogConfirmDelete = false;
         this.isOverlay = false;
       }
