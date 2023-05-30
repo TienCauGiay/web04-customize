@@ -60,6 +60,20 @@ const apiEmployeemanage = {
         } catch (error) {
             console.log(error);
         }
+    },
+
+    /**
+     * Mô tả: Gọi api cập nhật thông tin 1 nhân viên
+     * created by : BNTIEN
+     * created date: 30-05-2023 22:56:36
+     */
+    async putObject(url, obj) {
+        try {
+            const response = await axios.put(`${BASE_URL}${url}`, obj);
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 

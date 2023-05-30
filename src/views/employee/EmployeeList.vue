@@ -97,6 +97,7 @@
               <td
                 class="text-center employee-border-right e-birthday"
                 id="function-table"
+                @dblclick.stop
               >
                 <span>Sửa</span>
                 <div
@@ -111,7 +112,9 @@
                       <li>Nhân bản</li>
                       <li
                         class="menu-function-select-delete-employee"
-                        @click="onDeleteEmployee(item.EmployeeID)"
+                        @click="
+                          onDeleteEmployee(item.EmployeeID, item.EmployeeCode)
+                        "
                       >
                         Xóa
                       </li>
@@ -182,11 +185,16 @@
     ></div>
     <!-- dialog employee confirm delete -->
     <misa-dialog-employee-confirm-delete
-      :employeeIdDelete="employeeIdDeleteSelected"
+      :employeeCodeDelete="employeeCodeDeleteSelected"
       @confirmYesDeleteEmployee="onConfirmYesDeleteEmployee"
       @confirmNoDeleteEmployee="onConfirmNoDeleteEmployee"
       v-if="isShowDialogConfirmDelete"
     ></misa-dialog-employee-confirm-delete>
+    <misa-toast-message
+      v-if="isShowToastMessage"
+      :contentToast="contentToastSuccess"
+      @closeToastMessage="btnCloseToastMessage"
+    ></misa-toast-message>
   </div>
 </template>
 
@@ -196,6 +204,7 @@ import { formatDate } from "@/js/formatData.js";
 import apiEmployeemanage from "@/js/apiService";
 import { tableDataManageEmployee } from "@/common/tableData.js";
 import { CHECK_STATUS } from "@/common/apiStatus";
+import { textAttributeEmployee } from "@/common/attributeEmployee";
 export default {
   name: "EmployeeList",
   components: {
@@ -221,10 +230,16 @@ export default {
       recordOptions: ["10", "20", "30", "50", "100"],
       // Khai báo EmployeeId của nhân viên cần xóa
       employeeIdDeleteSelected: "",
+      // Khai báo EmployeeCode của nhân viên cần xóa
+      employeeCodeDeleteSelected: "",
       // Khai báo biến quy định trạng thái ẩn hiển dialog confirm delete
       isShowDialogConfirmDelete: false,
       // Khai báo biến kiểm tra xem form chi tiết đang ở trạng thái thêm hay sửa
       isStatusEdit: false,
+      // Khai báo trạng thái hiển thị của toast message
+      isShowToastMessage: false,
+      // Khai báo biến lưu nội dung của toast message
+      contentToastSuccess: "",
     };
   },
   created() {
@@ -319,10 +334,11 @@ export default {
      * created by : BNTIEN
      * created date: 29-05-2023 07:50:15
      */
-    onDeleteEmployee(employeeID) {
+    onDeleteEmployee(employeeID, employeeCode) {
       this.isShowDialogConfirmDelete = true;
       this.isOverlay = true;
       this.employeeIdDeleteSelected = employeeID;
+      this.employeeCodeDeleteSelected = employeeCode;
     },
     /**
      * Mô tả: Hàm xử lí sự kiện khi người dùng xác nhận xóa
@@ -338,6 +354,8 @@ export default {
         if (CHECK_STATUS.isResponseStatusOk(res.status)) {
           this.isShowDialogConfirmDelete = false;
           this.isOverlay = false;
+          this.contentToastSuccess = textAttributeEmployee.SUCCESS_DELETE;
+          this.isShowToastMessage = true;
         }
         // Sau khi xóa gọi lại api lấy danh sách nhân viên
         this.getListEmployee();
@@ -353,6 +371,15 @@ export default {
     onConfirmNoDeleteEmployee() {
       this.isShowDialogConfirmDelete = false;
       this.isOverlay = false;
+    },
+
+    /**
+     * Mô tả: Hàm xử lí sự kiện đóng toast mesage
+     * created by : BNTIEN
+     * created date: 31-05-2023 00:42:10
+     */
+    btnCloseToastMessage() {
+      this.isShowToastMessage = false;
     },
   },
 };

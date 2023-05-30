@@ -235,3 +235,9 @@
 	height: 45px;
     scale: 0.56 0.55;
 }
+
+.check-green-icon {
+	background: url('../../assets/icon/Sprites.64af8f61.svg') no-repeat -848px -312px;
+	width: 16px;
+	height: 16px;
+}

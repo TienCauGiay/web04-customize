@@ -16,7 +16,7 @@
     margin-left: 16px;
 }
 
-.toast-info img{
+.toast-info div{
     margin-right: 10px;
 }
 
@@ -26,11 +26,10 @@
     flex-direction: row-reverse;
 }
 
-.toast-exits img{
-    width: 16px;
-    height: 16px;
+.toast-exits div{
     margin-left: 16px;
     margin-right: 16px;
+    scale: 0.8 0.8;
 }
 
 .toast-exits img:hover{

@@ -7,8 +7,9 @@
       <div class="warning-yellow-icon dialog-content-icon"></div>
       <div class="dialog-content-main">
         <p>
-          Bạn có thực sự muốn xóa nhân viên &lt;{{ this.employeeIdDelete }}&gt;
-          không?
+          Bạn có thực sự muốn xóa nhân viên &lt;{{
+            this.employeeCodeDelete
+          }}&gt; không?
         </p>
       </div>
     </div>
@@ -29,7 +30,7 @@
 <script>
 export default {
   name: "MISADialogEmployeeConfirmDelete",
-  props: ["employeeIdDelete"],
+  props: ["employeeCodeDelete"],
   methods: {
     /**
      * Mô tả: Hàm gọi sự kiện xóa nhân viên khi người dùng chọn có trong component cha (EmployeeList)

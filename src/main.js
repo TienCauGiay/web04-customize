@@ -7,6 +7,7 @@ import MISADialogEmployeeConfirmDelete from './components/dialog/MISADialogEmplo
 import MISADialogEmployeeSaveAndClose from './components/dialog/MISADialogEmployeeSaveAndClose.vue'
 import MISAButtonDefault from './components/button/MISAButtonDefault.vue'
 import MISAButtonExtra from './components/button/MISAButtonExtra.vue'
+import MISAToastMessage from './components/toast/MISAToastMessage.vue'
 
 const app = createApp(App);
 app.component("misa-input", MISAInput);
@@ -16,4 +17,5 @@ app.component("misa-dialog-employee-confirm-delete", MISADialogEmployeeConfirmDe
 app.component("misa-dialog-employee-save-and-close", MISADialogEmployeeSaveAndClose);
 app.component("misa-button-default", MISAButtonDefault);
 app.component("misa-button-extra", MISAButtonExtra);
+app.component("misa-toast-message", MISAToastMessage);
 app.mount('#app');

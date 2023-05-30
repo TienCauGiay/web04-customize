@@ -27,7 +27,9 @@
             <misa-input
               ref="codeEmployee"
               v-model="employee.EmployeeCode"
-              :class="{ 'border-red': !employee.EmployeeCode }"
+              :class="{
+                'border-red': isBorderRed.Code && !employee.EmployeeCode,
+              }"
             ></misa-input>
           </div>
           <div class="col-md-tb">
@@ -35,7 +37,7 @@
             <misa-input
               ref="nameEmployee"
               v-model="employee.FullName"
-              :class="{ 'border-red': !employee.FullName }"
+              :class="{ 'border-red': isBorderRed.Name && !employee.FullName }"
             ></misa-input>
           </div>
         </div>
@@ -54,12 +56,14 @@
                 type="radio"
                 name="gender"
                 :checked="employee.GenderName === 'Nam'"
+                @change="selectGender('Nam')"
               />
               <span>Nam</span>
               <input
                 type="radio"
                 name="gender"
                 :checked="employee.GenderName === 'Nữ'"
+                @change="selectGender('Nữ')"
               />
               <span>Nữ</span>
               <input
@@ -68,6 +72,7 @@
                 :checked="
                   employee.GenderName !== 'Nam' && employee.GenderName !== 'Nữ'
                 "
+                @change="selectGender('Bê đê')"
               />
               <span>Khác</span>
             </div>
@@ -79,14 +84,13 @@
             <div
               class="e-cbb"
               id="e-cbb"
-              :class="{ 'border-red': !employee.UnitName }"
+              :class="{ 'border-red': isBorderRed.Unit && !employee.UnitName }"
             >
               <div class="e-textfield-cbb">
                 <misa-input
                   ref="unitEmployee"
                   placeholder="-- Chọn Đơn Vị --"
                   v-model="employee.UnitName"
-                  disabled
                 ></misa-input>
               </div>
               <i class="function-icon" @click="btnShowSelectUnit"></i>
@@ -201,6 +205,19 @@
       v-if="isShowDialogIdExits"
       @closeDialogIdExits="onCloseDialogIdExits"
     ></misa-dialog-employee-id-exits>
+    <!-- dialog employee save and close -->
+    <misa-dialog-employee-save-and-close
+      v-if="isShowDialogDataChange"
+      @cancelDialogDataChange="onCancelDialogDataChange"
+      @noDialogDataChange="onNoDialogDataChange"
+      @yesDialogDataChange="onYesDialogDataChange"
+    ></misa-dialog-employee-save-and-close>
+    <!-- toast mesage -->
+    <misa-toast-message
+      v-if="isShowToastMessage"
+      :contentToast="contentToastSuccess"
+      @closeToastMessage="btnCloseToastMessage"
+    ></misa-toast-message>
   </div>
 </template>
 
@@ -209,6 +226,7 @@ import { formatDate } from "@/js/formatData.js";
 import apiEmployeemanage from "@/js/apiService";
 import { tableDataManageEmployee } from "@/common/tableData.js";
 import { textAttributeEmployee } from "@/common/attributeEmployee.js";
+import { CHECK_STATUS } from "@/common/apiStatus";
 export default {
   name: "EmployeeDetail",
   props: ["employeeSelected", "statusEdit"],
@@ -223,7 +241,6 @@ export default {
       employee: {},
       // Khai báo danh sách các đơn vị
       listUnit: [],
-
       // Khai báo trạng thái hiển thị của dialog cảnh báo dữ liệu k được để trống
       isShowDialogDataNotNull: false,
       // Khai báo biến xác định nội dung trường nào k được để trống
@@ -232,6 +249,14 @@ export default {
       isShowDialogIdExits: false,
       // Khai báo biến xác định thông tin của mã nhân viên đã tồn tại
       contentEmployeeIdExits: "",
+      // Khai báo biến quy định trang thái hiển thị dialog dữ liệu đã bị thay đổi
+      isShowDialogDataChange: false,
+      // Khai báo biến xác định border red
+      isBorderRed: { Code: false, Name: false, Unit: false },
+      // Khai báo biến xác định trạng thái hiển thị của toast message
+      isShowToastMessage: false,
+      // Khai báo nội dung toast message
+      contentToastSuccess: "",
     };
   },
   // computed: {
@@ -331,7 +356,13 @@ export default {
      * created date: 29-05-2023 07:55:05
      */
     onBtnClose() {
-      this.btnCloseFormDetail();
+      if (
+        JSON.stringify(this.employeeSelected) !== JSON.stringify(this.employee)
+      ) {
+        this.isShowDialogDataChange = true;
+      } else {
+        this.btnCloseFormDetail();
+      }
     },
     /**
      * Mô tả: Hàm xử lí sự kiện khi người dùng bấm vào nut cất và thêm trên form chi tiết
@@ -344,16 +375,19 @@ export default {
         if (!this.employee.EmployeeCode) {
           this.isShowDialogDataNotNull = true;
           this.dataNotNull = textAttributeEmployee.CODE;
+          this.isBorderRed.Code = true;
           return;
         }
         if (!this.employee.FullName) {
           this.isShowDialogDataNotNull = true;
           this.dataNotNull = textAttributeEmployee.NAME;
+          this.isBorderRed.Name = true;
           return;
         }
         if (!this.employee.UnitName) {
           this.isShowDialogDataNotNull = true;
           this.dataNotNull = textAttributeEmployee.UNIT;
+          this.isBorderRed.Unit = true;
           return;
         }
         // Kiểm tra xem mã nhân viên đã tồn tại trong database chưa, nếu đã tồn tại thì thông báo cho người dùng
@@ -365,17 +399,19 @@ export default {
         employeeById = res.data;
         if (!employeeById) {
           // Nếu mã nhân viên chưa tồn tại trong hệ thống
-          // Bắt đầu Có vấn đề
           let unitAdd = this.listUnit.find(
-            (unit) => unit.UnitName === employeeById.UnitName
+            (unit) => unit.UnitName === this.employee.UnitName
           );
           this.employee.UnitID = unitAdd.UnitID;
-          // Kết thúc có vấn đề
-          const idAdded = await apiEmployeemanage.postObject(
+          const res = await apiEmployeemanage.postObject(
             `/${tableDataManageEmployee.EMPLOYEE}`,
             this.employee
           );
-          console.log(idAdded);
+          if (CHECK_STATUS.isResponseStatusOk(res.status)) {
+            this.contentToastSuccess = textAttributeEmployee.SUCCESS_CTEATE;
+            this.isShowToastMessage = true;
+            this.employee = {};
+          }
         } else {
           // Nếu mã nhân viên đã tồn tại trong hệ thống
           this.isShowDialogIdExits = true;
@@ -383,8 +419,6 @@ export default {
         }
       } catch (error) {
         console.log(error);
-      } finally {
-        this.btnCloseFormDetail();
       }
     },
     /**
@@ -424,6 +458,61 @@ export default {
     onCloseDialogIdExits() {
       this.isShowDialogIdExits = false;
     },
+    /**
+     * Mô tả: Xử lí xem radio giới tính nào được chọn
+     * created by : BNTIEN
+     * created date: 30-05-2023 22:32:23
+     */
+    selectGender(gender) {
+      this.employee.GenderName = gender;
+    },
+
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi bấm vào button hủy trong dialog dữ liệu đã bị thay đổi
+     * created by : BNTIEN
+     * created date: 30-05-2023 23:40:13
+     */
+    onCancelDialogDataChange() {
+      this.isShowDialogDataChange = false;
+    },
+
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi bấm vào button không trong dialog dữ liệu đã bị thay đổi
+     * created by : BNTIEN
+     * created date: 30-05-2023 23:42:10
+     */
+    onNoDialogDataChange() {
+      this.btnCloseFormDetail();
+    },
+
+    /**
+     * Mô tả: Hàm xử lí sự kiện khi bấm vào button có trong dialog dữ liệu đã bị thay đổi
+     * created by : BNTIEN
+     * created date: 30-05-2023 23:43:38
+     */
+    async onYesDialogDataChange() {
+      try {
+        const res = await apiEmployeemanage.putObject(
+          `/${tableDataManageEmployee.EMPLOYEE}`,
+          this.employee
+        );
+        this.btnCloseFormDetail();
+        if (CHECK_STATUS.isResponseStatusOk(res.status)) {
+          console.log(res);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    /**
+     * Mô tả: Hàm xử lí sự kiện đóng toast message
+     * created by : BNTIEN
+     * created date: 31-05-2023 01:15:51
+     */
+    btnCloseToastMessage() {
+      this.isShowToastMessage = false;
+    },
   },
 };
 </script>
@@ -449,7 +538,15 @@ i:hover {
   background-color: white;
 }
 
+.e-textfield-cbb input:focus {
+  border: none;
+}
+
 .border-red {
   border: 1px solid red;
+}
+
+.toast-success {
+  top: -50px;
 }
 </style>

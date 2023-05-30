@@ -31,9 +31,3 @@ html, body {
     transform: translate(-50%, -50%);
 }
 /* End css position display */
-
-/* Start css dialog employee */
-#dialog-question-employee{
-    display: none;
-}
-/* End css dialog employee */
