@@ -5,11 +5,10 @@
  */
 const formatDate = (value) => {
     try {
-      let date = new Date(value);
-      let day = date.getDay().toString().padStart(2, "0");
-      let month = (date.getMonth() + 1).toString().padStart(2, "0");
-      let year = date.getFullYear();
-      return `${day}/${month}/${year}`;
+      value=value.substring(0,10);
+      const dates = value.split("-");
+      const res = dates[2] + "/" + dates[1] + "/" + dates[0];
+      return res;
     } catch (error) {
       return "";
     }

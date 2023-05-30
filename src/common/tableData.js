@@ -1,6 +1,6 @@
 const tableDataManageEmployee = {
-    EMPLOYEE :"Employees",
-    DEPARTMENT: "Departments"
+    EMPLOYEE :"employee",
+    UNIT: "unit"
 };
 
 export {tableDataManageEmployee}

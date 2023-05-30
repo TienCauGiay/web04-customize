@@ -25,20 +25,25 @@
           <div class="col-md-n">
             <label>Mã <span class="s-require">*</span></label>
             <misa-input
-              v-model="employee.EmployeeCode"
               ref="codeEmployee"
+              v-model="employee.EmployeeCode"
+              :class="{ 'border-red': !employee.EmployeeCode }"
             ></misa-input>
           </div>
           <div class="col-md-tb">
             <label>Tên <span class="s-require">*</span></label>
-            <misa-input v-model="employee.FullName"></misa-input>
+            <misa-input
+              ref="nameEmployee"
+              v-model="employee.FullName"
+              :class="{ 'border-red': !employee.FullName }"
+            ></misa-input>
           </div>
         </div>
         <div class="half-content">
           <div class="col-md-n">
             <label>Ngày sinh</label>
             <misa-input
-              v-model="formattedDate"
+              v-model="employee.DateOfBirth"
               placeholder="dd/mm/yyyy"
             ></misa-input>
           </div>
@@ -71,11 +76,16 @@
         <div class="half-content">
           <div class="col-md-l" style="position: relative">
             <label>Đơn vị <span class="s-require">*</span></label>
-            <div class="e-cbb" id="e-cbb">
+            <div
+              class="e-cbb"
+              id="e-cbb"
+              :class="{ 'border-red': !employee.UnitName }"
+            >
               <div class="e-textfield-cbb">
                 <misa-input
+                  ref="unitEmployee"
                   placeholder="-- Chọn Đơn Vị --"
-                  v-model="employee.DepartmentName"
+                  v-model="employee.UnitName"
                   disabled
                 ></misa-input>
               </div>
@@ -89,9 +99,9 @@
                 <li
                   v-for="(unit, index) in listUnit"
                   :key="index"
-                  @click="onSelectedUnit(unit.DepartmentName)"
+                  @click="onSelectedUnit(unit.UnitName)"
                 >
-                  {{ unit.DepartmentName }}
+                  {{ unit.UnitName }}
                 </li>
               </ul>
             </div>
@@ -100,46 +110,46 @@
         <div class="half-content">
           <div class="col-md-tb">
             <label title="Số chứng minh nhân dân">Số CMND</label>
-            <misa-input></misa-input>
+            <misa-input v-model="employee.CMNDNumber"></misa-input>
           </div>
           <div class="col-md-n">
             <label>Ngày cấp</label>
             <misa-input
-              v-model="employee.DateOfRelease"
               placeholder="dd/mm/yyyy"
+              v-model="employee.CMNDDate"
             ></misa-input>
           </div>
         </div>
         <div class="half-content">
           <div class="col-md-l">
             <label>Chức danh</label>
-            <misa-input></misa-input>
+            <misa-input v-model="employee.TitleProfessional"></misa-input>
           </div>
         </div>
         <div class="half-content">
           <div class="col-md-l">
             <label>Nơi cấp</label>
-            <misa-input></misa-input>
+            <misa-input v-model="employee.CMNDAddress"></misa-input>
           </div>
         </div>
         <div class="full-content" id="content-null"></div>
         <div class="full-content">
           <label>Địa chỉ</label>
-          <misa-input></misa-input>
+          <misa-input v-model="employee.EmployeeAddress"></misa-input>
         </div>
         <div class="full-content">
           <div class="full-content-quarter">
             <div class="col-md-quater">
               <label title="Điện thoại di động">ĐT di động</label>
-              <misa-input></misa-input>
+              <misa-input v-model="employee.PhoneNumber"></misa-input>
             </div>
             <div class="col-md-quater">
               <label title="Điện thoại cố định">ĐT cố định</label>
-              <misa-input></misa-input>
+              <misa-input v-model="employee.PhoneLandline"></misa-input>
             </div>
             <div class="col-md-quater">
               <label>Email</label>
-              <misa-input></misa-input>
+              <misa-input v-model="employee.Email"></misa-input>
             </div>
           </div>
         </div>
@@ -147,15 +157,15 @@
           <div class="full-content-quarter">
             <div class="col-md-quater">
               <label>Tài khoản ngân hàng</label>
-              <misa-input></misa-input>
+              <misa-input v-model="employee.BankAccount"></misa-input>
             </div>
             <div class="col-md-quater">
               <label>Tên ngân hàng</label>
-              <misa-input></misa-input>
+              <misa-input v-model="employee.BankName"></misa-input>
             </div>
             <div class="col-md-quater">
               <label>Chi nhánh</label>
-              <misa-input></misa-input>
+              <misa-input v-model="employee.BankBranch"></misa-input>
             </div>
           </div>
         </div>
@@ -198,19 +208,12 @@
 import { formatDate } from "@/js/formatData.js";
 import apiEmployeemanage from "@/js/apiService";
 import { tableDataManageEmployee } from "@/common/tableData.js";
+import { textAttributeEmployee } from "@/common/attributeEmployee.js";
 export default {
   name: "EmployeeDetail",
   props: ["employeeSelected", "statusEdit"],
   created() {
-    if (!this.statusEdit) {
-      this.employee = {};
-    } else {
-      // Chuyển đối tượng sang chuỗi json
-      let res = JSON.stringify(this.employeeSelected);
-      // Chuyển đổi chuỗi json thành đối tượng employee
-      this.employee = JSON.parse(res);
-      this.getListDepartment();
-    }
+    this.loadData();
   },
   data() {
     return {
@@ -220,6 +223,7 @@ export default {
       employee: {},
       // Khai báo danh sách các đơn vị
       listUnit: [],
+
       // Khai báo trạng thái hiển thị của dialog cảnh báo dữ liệu k được để trống
       isShowDialogDataNotNull: false,
       // Khai báo biến xác định nội dung trường nào k được để trống
@@ -230,19 +234,66 @@ export default {
       contentEmployeeIdExits: "",
     };
   },
-  computed: {
-    formattedDate: {
-      get() {
-        return this.formatDate(this.employee.DateOfBirth) !== "NaN/NaN/NaN"
-          ? this.formatDate(this.employee.DateOfBirth)
-          : "";
-      },
-      set(value) {
-        this.employee.DateOfBirth = value;
-      },
-    },
-  },
+  // computed: {
+  //   formattedDateBirth: {
+  //     get() {
+  //       return this.formatDate(this.employee.DateOfBirth) !==
+  //         textAttributeEmployee.DATE_NaN
+  //         ? this.formatDate(this.employee.DateOfBirth)
+  //         : "";
+  //     },
+  //     set(value) {
+  //       this.employee.DateOfBirth = value;
+  //     },
+  //   },
+  //   formattedDateCMND: {
+  //     get() {
+  //       return this.formatDate(this.employee.CMNDDate) !==
+  //         textAttributeEmployee.DATE_NaN
+  //         ? this.formatDate(this.employee.CMNDDate)
+  //         : "";
+  //     },
+  //     set(value) {
+  //       this.employee.CMNDDate = value;
+  //     },
+  //   },
+  // },
   methods: {
+    /**
+     * Mô tả: Hàm lấy danh sách department từ api
+     * created by : BNTIEN
+     * created date: 29-05-2023 07:56:10
+     */
+    async getListUnit() {
+      try {
+        const res = await apiEmployeemanage.getListAllObject(
+          `/${tableDataManageEmployee.UNIT}`
+        );
+        this.listUnit = res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả: gọi api lấy dữ liệu
+     * created by : BNTIEN
+     * created date: 30-05-2023 14:57:33
+     */
+    loadData() {
+      this.getListUnit();
+      if (!this.statusEdit) {
+        this.employee = {};
+      } else {
+        try {
+          // Chuyển đối tượng sang chuỗi json
+          let res = JSON.stringify(this.employeeSelected);
+          // Chuyển đổi chuỗi json thành đối tượng employee
+          this.employee = JSON.parse(res);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
     /**
      * Mô tả: Tái sử dụng hàm formatDate
      * created by : BNTIEN
@@ -269,10 +320,10 @@ export default {
     /**
      * Mô tả: Hàm xử lí sự kiện khi người dùng chọn đơn vị
      * created by : BNTIEN
-     * created date: 29-05-2023 07:54:52
+     * created date: 29-05-2023 07:54:52`
      */
     onSelectedUnit(unit) {
-      this.employee.DepartmentName = unit;
+      this.employee.UnitName = unit;
     },
     /**
      * Mô tả: Hàm xử lí sự kiện khi người dùng bấm vào nút cất trên form chi tiết
@@ -280,7 +331,7 @@ export default {
      * created date: 29-05-2023 07:55:05
      */
     onBtnClose() {
-      // Chưa xử lí
+      this.btnCloseFormDetail();
     },
     /**
      * Mô tả: Hàm xử lí sự kiện khi người dùng bấm vào nut cất và thêm trên form chi tiết
@@ -290,18 +341,19 @@ export default {
     async onBtnSaveAndClose() {
       try {
         // Kiểm tra xem các trường bắt buộc đã được nhập dữ liệu chưa, nếu chưa thì thông báo cho người dùng
-        this.isShowDialogDataNotNull = true;
         if (!this.employee.EmployeeCode) {
-          this.dataNotNull = "Mã";
-          this.$refs.codeEmployee.focus();
+          this.isShowDialogDataNotNull = true;
+          this.dataNotNull = textAttributeEmployee.CODE;
           return;
         }
         if (!this.employee.FullName) {
-          this.dataNotNull = "Tên";
+          this.isShowDialogDataNotNull = true;
+          this.dataNotNull = textAttributeEmployee.NAME;
           return;
         }
-        if (!this.employee.DepartmentName) {
-          this.dataNotNull = "Đơn vị";
+        if (!this.employee.UnitName) {
+          this.isShowDialogDataNotNull = true;
+          this.dataNotNull = textAttributeEmployee.UNIT;
           return;
         }
         // Kiểm tra xem mã nhân viên đã tồn tại trong database chưa, nếu đã tồn tại thì thông báo cho người dùng
@@ -311,35 +363,51 @@ export default {
           `/${this.employee.EmployeeCode}`
         );
         employeeById = res.data;
-        if (JSON.stringify(employeeById) === JSON.stringify({})) {
-          // Nếu mã nhân viên cần thêm chưa có trong hệ thống
-          alert(1);
+        if (!employeeById) {
+          // Nếu mã nhân viên chưa tồn tại trong hệ thống
+          // Bắt đầu Có vấn đề
+          let unitAdd = this.listUnit.find(
+            (unit) => unit.UnitName === employeeById.UnitName
+          );
+          this.employee.UnitID = unitAdd.UnitID;
+          // Kết thúc có vấn đề
+          const idAdded = await apiEmployeemanage.postObject(
+            `/${tableDataManageEmployee.EMPLOYEE}`,
+            this.employee
+          );
+          console.log(idAdded);
         } else {
-          alert(2);
+          // Nếu mã nhân viên đã tồn tại trong hệ thống
+          this.isShowDialogIdExits = true;
+          this.contentEmployeeIdExits = employeeById.EmployeeCode;
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        this.btnCloseFormDetail();
       }
     },
     /**
-     * Mô tả: Hàm đóng dialog cảnh báo dữ liệu k được để trống
+     * Mô tả: Hàm đóng dialog cảnh báo dữ liệu k được để trống và focus vào các ô trống
      * created by : BNTIEN
      * created date: 29-05-2023 07:55:59
      */
     onCloseBtnSaveAndClose() {
       this.isShowDialogDataNotNull = false;
+      if (!this.employee.EmployeeCode) {
+        this.$refs.codeEmployee.$el.focus();
+        return;
+      }
+      if (!this.employee.FullName) {
+        this.$refs.nameEmployee.$el.focus();
+        return;
+      }
+      if (!this.employee.UnitName) {
+        this.$refs.unitEmployee.$el.focus();
+        return;
+      }
     },
-    /**
-     * Mô tả: Hàm lấy danh sách department từ api
-     * created by : BNTIEN
-     * created date: 29-05-2023 07:56:10
-     */
-    async getListDepartment() {
-      const res = await apiEmployeemanage.getListAllObject(
-        `/${tableDataManageEmployee.DEPARTMENT}`
-      );
-      this.listUnit = res.data;
-    },
+
     /**
      * Mô tả: Hàm xử lí sự kiện khi click vào nút hủy trong form chi tiết
      * created by : BNTIEN
@@ -379,5 +447,9 @@ i:hover {
 
 .e-textfield-cbb input:hover {
   background-color: white;
+}
+
+.border-red {
+  border: 1px solid red;
 }
 </style>

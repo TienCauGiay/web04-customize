@@ -70,7 +70,7 @@
           <!-- Kiểm tra list employees có rỗng hay không, nếu không rỗng mới hiển thị lên table -->
           <tbody v-if="employees.length > 0">
             <tr
-              v-for="item in employees"
+              v-for="(item, index) in employees"
               :key="item.EmployeeId"
               @dblclick="btnUpdateFormDetail(item)"
             >
@@ -88,12 +88,12 @@
               <td class="text-center e-birthday">
                 {{ formatDate(item.DateOfBirth) }}
               </td>
-              <td>043436894</td>
-              <td>Trưởng Nhóm</td>
-              <td>{{ item.DepartmentName }}</td>
-              <td>0549330586229</td>
-              <td>Vietcombank</td>
-              <td>Thanh Hóa</td>
+              <td>{{ item.CMNDNumber }}</td>
+              <td>{{ item.TitleProfessional }}</td>
+              <td>{{ item.UnitName }}</td>
+              <td>{{ item.BankAccount }}</td>
+              <td>{{ item.BankName }}</td>
+              <td>{{ item.BankBranch }}</td>
               <td
                 class="text-center employee-border-right e-birthday"
                 id="function-table"
@@ -111,7 +111,7 @@
                       <li>Nhân bản</li>
                       <li
                         class="menu-function-select-delete-employee"
-                        @click="onDeleteEmployee(item.EmployeeId)"
+                        @click="onDeleteEmployee(item.EmployeeID)"
                       >
                         Xóa
                       </li>
@@ -212,26 +212,7 @@ export default {
       // Khai báo biến quy định trạng thái hiển thị của các item select paging
       isShowPaging: false,
       // Khai báo list employee
-      employees: [
-        {
-          EmployeeCode: "NV-001",
-          FullName: "Bùi Ngọc Tiến",
-          GenderName: "Nam",
-          DateOfBirth: "2023-05-09T00:00:00",
-        },
-        {
-          EmployeeCode: "NV-002",
-          FullName: "Bùi Duyên",
-          GenderName: "Nữ",
-          DateOfBirth: "2020-06-02T00:00:00",
-        },
-        {
-          EmployeeCode: "NV-003",
-          FullName: "Bùi Tuyên",
-          GenderName: "",
-          DateOfBirth: "1970-05-01T00:00:00",
-        },
-      ],
+      employees: [],
       // Khai báo 1 nhân viên được chọn để xử lí hàm sửa
       employeeUpdate: {},
       // Khai báo số bản ghi mặc định được hiển thi trên table
@@ -297,10 +278,14 @@ export default {
      * created date: 29-05-2023 07:49:20
      */
     async getListEmployee() {
-      const res = await apiEmployeemanage.getListAllObject(
-        `/${tableDataManageEmployee.EMPLOYEE}`
-      );
-      this.employees = res.data;
+      try {
+        const res = await apiEmployeemanage.getListAllObject(
+          `/${tableDataManageEmployee.EMPLOYEE}`
+        );
+        this.employees = res.data;
+      } catch (error) {
+        console.log(error);
+      }
     },
     /**
      * Mô tả: Hàm xử lí sự kiên load lại toàn bộ dữ liệu khi click vào icon refresh
@@ -308,7 +293,7 @@ export default {
      * created date: 29-05-2023 07:49:31
      */
     refreshData() {
-      location.reload();
+      this.getListEmployee();
     },
     /**
      * Mô tả: Hàm xử lí cập nhật thông tin nhân viên
@@ -334,10 +319,10 @@ export default {
      * created by : BNTIEN
      * created date: 29-05-2023 07:50:15
      */
-    onDeleteEmployee(employeeId) {
+    onDeleteEmployee(employeeID) {
       this.isShowDialogConfirmDelete = true;
       this.isOverlay = true;
-      this.employeeIdDeleteSelected = employeeId;
+      this.employeeIdDeleteSelected = employeeID;
     },
     /**
      * Mô tả: Hàm xử lí sự kiện khi người dùng xác nhận xóa
@@ -345,16 +330,20 @@ export default {
      * created date: 28-05-2023 21:09:01
      */
     async onConfirmYesDeleteEmployee() {
-      const res = await apiEmployeemanage.getObjectById(
-        `/${tableDataManageEmployee.EMPLOYEE}`,
-        `/${this.employeeIdDeleteSelected}`
-      );
-      if (CHECK_STATUS.isResponseStatusOk(res.status)) {
-        this.isShowDialogConfirmDelete = false;
-        this.isOverlay = false;
+      try {
+        const res = await apiEmployeemanage.deleteObjectById(
+          `/${tableDataManageEmployee.EMPLOYEE}`,
+          `/${this.employeeIdDeleteSelected}`
+        );
+        if (CHECK_STATUS.isResponseStatusOk(res.status)) {
+          this.isShowDialogConfirmDelete = false;
+          this.isOverlay = false;
+        }
+        // Sau khi xóa gọi lại api lấy danh sách nhân viên
+        this.getListEmployee();
+      } catch (error) {
+        console.log(error);
       }
-      // Sau khi xóa gọi lại api lấy danh sách nhân viên
-      this.getListEmployee();
     },
     /**
      * Mô tả: Hàm xử lí sự kiện khi click vào button không trong dialog xác nhận xóa
